@@ -47,8 +47,7 @@ class MainWindow : public QMainWindow
     //WIDGETS
     InfoWidget infoWidg;
     ConfigWidget configWidget;
-
-
+    //Binr2
 
 };
 
