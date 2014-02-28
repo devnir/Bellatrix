@@ -305,6 +305,9 @@
     <addaction name="actionShow_logs"/>
    </widget>
    <widget class="QMenu" name="menuPlugins">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>Plugins</string>
     </property>

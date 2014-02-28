@@ -28,8 +28,6 @@ void MainWindow::guiInit()
   ui->serialBar->addWidget(portBox);
   ui->serialBar->addWidget(baudBox);
 
-
-  changeStyle();
   ui->actionDisconnect->setEnabled(false);
   ui->actionDisconnect->setVisible(false);
   ui->actionSettings->setEnabled(true);
@@ -88,10 +86,14 @@ void MainWindow::changeStyle()
     QString StyleSheet = QLatin1String(File.readAll());
     this->setStyleSheet(StyleSheet);
     updatePluginStyle(StyleSheet);
+    configWidget.setStyleSheet(StyleSheet);
+    infoWidg.setStyleSheet(StyleSheet);
   }
   else
   {
     this->setStyleSheet("");
+    configWidget.setStyleSheet("");
+    infoWidg.setStyleSheet("");
     loging(_LOG_CRIT_, "Style load error\r\n");
   }
 

@@ -38,6 +38,8 @@ class ConfigWidget : public QWidget
 
     void on_QASBarEn_stateChanged(int arg1);
 
+    void on_tabWidget_currentChanged(int index);
+
   signals:
     void signalEnabledQA(bool enabled);
     void signalEnabledQAS(bool enabled);

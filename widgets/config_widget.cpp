@@ -5,6 +5,7 @@
 #include "QFile"
 #include "QDir"
 
+QStringList pluginList[_MAX_PLUGINS_];
 
 ConfigWidget::ConfigWidget(QWidget *parent) :
   QWidget(parent),
@@ -12,6 +13,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 {
   ui->setupUi(this);
   set.load();
+
 }
 
 ConfigWidget::~ConfigWidget()
@@ -95,7 +97,7 @@ void ConfigWidget::closeEvent(QCloseEvent *)
   set.save();
 }
 
-void ConfigWidget::on_styleBox_currentIndexChanged(int index)
+void ConfigWidget::on_styleBox_currentIndexChanged(int)
 {
   set.view.styleName = ui->styleBox->currentText();
   set.save();
@@ -113,5 +115,30 @@ void ConfigWidget::on_QASBarEn_stateChanged(int arg1)
   {
     set.view.QAseriaEn = 0;
     emit signalEnabledQAS(false);
+  }
+}
+
+
+void ConfigWidget::on_tabWidget_currentChanged(int index)
+{
+  if(index == 1)
+  {
+    ui->pluginWiew->clear();
+    int row = 1;
+    ui->pluginWiew->insertRow(6);
+    for(int i = 0; i < _MAX_PLUGINS_; i++)
+    {
+      if(plugins[i].validity == 1)
+      {
+        ui->pluginWiew->insertRow(0);
+        QTableWidgetItem *fName = new QTableWidgetItem;
+        fName->setText(plugins[i].fileName);
+        QTableWidgetItem *fDesc = new QTableWidgetItem;
+        fDesc->setText(plugins[i].name);
+        ui->pluginWiew->setItem(0, 0, fName);
+        ui->pluginWiew->setItem(0, 1, fDesc);
+        row++;
+      }
+    }
   }
 }

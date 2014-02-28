@@ -22,11 +22,12 @@ MainWindow::MainWindow(QWidget *parent) :
   b2Ptr.p80 = &px80;
   b2Ptr.p90 = &px90;
   b2Ptr.pC0 = &pxC0;
-  Binr2Init(b2Ptr);
-
+  Binr2Init(b2Ptr);  
   guiInit();
-  searchInit();
   load_plugins();
+  changeStyle();
+  searchInit();
+
 }
 
 MainWindow::~MainWindow()

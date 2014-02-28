@@ -6,61 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>545</width>
+    <height>347</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Bellatrix Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="defButton">
-       <property name="text">
-        <string>To default</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>1</number>
      </property>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>Sync</string>
-      </attribute>
-     </widget>
      <widget class="QWidget" name="view_tab">
       <attribute name="title">
        <string>View</string>
@@ -142,6 +100,38 @@
         </item>
        </layout>
       </widget>
+      <widget class="QPushButton" name="defButton">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>250</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>To default</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Plugins</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QTableWidget" name="pluginWiew">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="columnCount">
+          <number>2</number>
+         </property>
+         <column/>
+         <column/>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
