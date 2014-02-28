@@ -5,8 +5,10 @@
 #include <QStringList>
 
 
+extern QString colorStr[];
+extern QString endStr;
 
-extern C_CPP QString log(int type, QString str);
+extern C_CPP QString loging(int type, QString str);
 extern C_CPP QStringList getLogs();
 
 

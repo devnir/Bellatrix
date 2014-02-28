@@ -22,6 +22,7 @@ class InfoWidget : public QTabWidget
 
   private:
     Ui::InfoWidget *ui;
+
 };
 
 #endif // INFOWIDGET_H

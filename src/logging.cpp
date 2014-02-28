@@ -12,7 +12,7 @@ QString colorStr[3] =
 QString endStr = "</font>";
 
 
-QString log(int type, QString str)
+QString loging(int type, QString str)
 {
   QString out;
   out = colorStr[type] + str + endStr;

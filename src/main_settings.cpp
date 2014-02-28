@@ -17,9 +17,13 @@ void MainSettings::load()
   set.beginGroup(_MSG_VIEW_);
   view.QAtoolbarEn = set.value(_MSK_QAT_EN_, _QAT_ENABLE_).toInt();
   view.styleName = set.value(_MSK_STYLE_, _DEFAULT_TEMPLATE_).toString();
+  view.QAseriaEn = set.value(_MSK_QAS_EN_,_QAS_ENABLE_).toInt();
   set.endGroup();
 
-
+  set.beginGroup(_MSG_SERIAL_);
+  serial.portName = set.value(_MSK_PNAME_, "").toString();
+  serial.baud    = set.value(_MSK_PBAUD_, 115200).toInt();
+  set.endGroup();
 }
 
 void MainSettings::save()
@@ -32,7 +36,13 @@ void MainSettings::save()
 
   set.beginGroup(_MSG_VIEW_);
   set.setValue(_MSK_QAT_EN_, view.QAtoolbarEn);
+  set.setValue(_MSK_QAS_EN_, view.QAseriaEn);
   set.setValue(_MSK_STYLE_, view.styleName);
+  set.endGroup();
+
+  set.beginGroup(_MSG_SERIAL_);
+  set.setValue(_MSK_PNAME_, serial.portName);
+  set.setValue(_MSK_PBAUD_, (int)serial.baud);
   set.endGroup();
 }
 
@@ -42,6 +52,7 @@ void MainSettings::toDef()
   version.minor = _VERSION_MINOR_;
 
   view.QAtoolbarEn = _QAT_ENABLE_;
+  view.QAseriaEn = _QAS_ENABLE_;
   view.styleName = _DEFAULT_TEMPLATE_;
 
   save();

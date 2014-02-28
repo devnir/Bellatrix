@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     src/main_settings.cpp \
     src/logging.cpp \
     widgets/infowidget.cpp \
-    widgets/config_widget.cpp
+    widgets/config_widget.cpp \
+    src/util.cpp \
+    src/plugin_manager.cpp
 
 HEADERS  += mainwindow.h \
     src/typedef.h \
@@ -34,7 +36,9 @@ HEADERS  += mainwindow.h \
     src/main_settings.h \
     src/logging.h \
     widgets/infowidget.h \
-    widgets/config_widget.h
+    widgets/config_widget.h \
+    src/util.h \
+    src/pointersType.h
 
 FORMS    += mainwindow.ui \
     widgets/infowidget.ui \

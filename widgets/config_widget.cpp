@@ -42,6 +42,11 @@ void ConfigWidget::updateData()
     ui->QABarEnable->setChecked(false);
   }
 
+  if(set.view.QAseriaEn)
+    ui->QASBarEn->setChecked(true);
+  else
+    ui->QASBarEn->setChecked(false);
+
 
   QDir dir("./template/");
   dir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -95,4 +100,18 @@ void ConfigWidget::on_styleBox_currentIndexChanged(int index)
   set.view.styleName = ui->styleBox->currentText();
   set.save();
   emit signalStyleChaged();
+}
+
+void ConfigWidget::on_QASBarEn_stateChanged(int arg1)
+{
+  if(arg1 == Qt::Checked)
+  {
+    set.view.QAseriaEn = 1;
+    emit signalEnabledQAS(true);
+  }
+  else if(arg1 == Qt::Unchecked)
+  {
+    set.view.QAseriaEn = 0;
+    emit signalEnabledQAS(false);
+  }
 }

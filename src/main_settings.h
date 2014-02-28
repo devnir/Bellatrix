@@ -14,7 +14,15 @@ typedef struct
 {
   QString   styleName;
   INT8U     QAtoolbarEn;
+  INT8U     QAseriaEn;
 }TView;
+
+typedef struct
+{
+  QString portName;
+  INT32U  baud;
+}TSerial;
+
 class MainSettings
 {
   public:
@@ -23,8 +31,9 @@ class MainSettings
     void save();
     void toDef();
     //Version
-    TVersion version;
-    TView view;
+    TVersion   version;
+    TView      view;
+    TSerial    serial;
 };
 
 #endif // MAIN_SETTINGS_H

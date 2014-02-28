@@ -36,8 +36,11 @@ class ConfigWidget : public QWidget
 
     void on_styleBox_currentIndexChanged(int index);
 
+    void on_QASBarEn_stateChanged(int arg1);
+
   signals:
     void signalEnabledQA(bool enabled);
+    void signalEnabledQAS(bool enabled);
     void signalStyleChaged();
 
   private:
