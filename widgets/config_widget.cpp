@@ -12,7 +12,10 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
   ui(new Ui::ConfigWidget)
 {
   ui->setupUi(this);
+  connect(&addPlugDialog, SIGNAL(okkPressed(QString,QString)),
+          this, SLOT(slotAddOkPresed(QString,QString)));
   set.load();
+  on_tabWidget_currentChanged(1);
 
 }
 
@@ -121,11 +124,13 @@ void ConfigWidget::on_QASBarEn_stateChanged(int arg1)
 
 void ConfigWidget::on_tabWidget_currentChanged(int index)
 {
+
   if(index == 1)
   {
     ui->pluginWiew->clear();
+    for(int i = 0; i < ui->pluginWiew->rowCount(); i++)
+      ui->pluginWiew->removeRow(i);
     int row = 1;
-    ui->pluginWiew->insertRow(6);
     for(int i = 0; i < _MAX_PLUGINS_; i++)
     {
       if(plugins[i].validity == 1)
@@ -135,10 +140,56 @@ void ConfigWidget::on_tabWidget_currentChanged(int index)
         fName->setText(plugins[i].fileName);
         QTableWidgetItem *fDesc = new QTableWidgetItem;
         fDesc->setText(plugins[i].name);
+
         ui->pluginWiew->setItem(0, 0, fName);
         ui->pluginWiew->setItem(0, 1, fDesc);
         row++;
       }
+    }
+  }
+}
+
+void ConfigWidget::on_pluginWiew_cellChanged(int row, int column)
+{
+    ui->delBtn->setEnabled(true);
+    ui->editBtn->setEnabled(true);
+
+}
+
+void ConfigWidget::on_addBtn_clicked()
+{
+  addPlugDialog.show();
+}
+
+void ConfigWidget::slotAddOkPresed(QString pluginPath, QString pluginName)
+{
+  for(int i = 0; i < _MAX_PLUGINS_; i++)
+  {
+    if(plugins[i].validity == 1)
+    {
+      if(plugins[i].fileName == pluginPath)
+        return; //уже подключен
+    }
+  }
+
+  for(int i = 0; i < _MAX_PLUGINS_; i++)
+  {
+    if(plugins[i].validity != 1)
+    {
+      plugins[i].validity = 1;
+      plugins[i].fileName = pluginPath;
+      plugins[i].name = pluginName;
+
+      //Сохранение инсталированых плагинов
+      QSettings pl(_PL_NAME_, QSettings::IniFormat);
+      pl.beginWriteArray(_PL_ARR_);
+      pl.setArrayIndex(i);
+      pl.setValue(_PLA_ENABLE_, plugins[i].validity);
+      pl.setValue(_PLA_NAME_, plugins[i].name);
+      pl.setValue(_PLA_FILE_, plugins[i].fileName);
+      pl.endArray();
+      on_tabWidget_currentChanged(1);
+      return;
     }
   }
 }

@@ -28,7 +28,7 @@ void MainWindow::searchStart()
   searchIndex = 0;
   setStatusText(_LOG_NORM_, tr("Search"));
   setPortText(baudTable[searchIndex]);
-  int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2Single, 1);
+  int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2PVT, 1);
   searchPort->setPortName(portBox->currentText());
   if(searchPort->open(QIODevice::ReadWrite))
   {
@@ -77,7 +77,6 @@ void MainWindow::slotSearchDataRead()
       searchDone();
     }
   }
-
 }
 
 void MainWindow::slotSearchTimeout()
@@ -159,6 +158,11 @@ void MainWindow::slotSerialRead()
     ret = Binr2Unpack(data.at(i) & 0xFF);
     if(ret != 0)
     {
+      qDebug("Income 0x%02X, Size: %d", ret, Binr2DataSize);
+      if(ret == 0x80)
+      {
+        qDebug("0x80 0x%02X 0x%02X", Binr2DataBuff[1], Binr2DataBuff[2] );
+      }
       updateLocalData();
       updatePluginData();
     }
@@ -203,6 +207,9 @@ void MainWindow::on_actionConnect_triggered()
 
 void MainWindow::on_actionDisconnect_triggered()
 {
+    int l = Binr2ReqEncode(OutBuff, 0x00, Binr2CancelAll, 0);
+    port->write((char *)OutBuff, l);
+    port->waitForBytesWritten(100);
     port->close();
     ui->actionConnect->setVisible(true);
     ui->actionConnect->setEnabled(true);

@@ -354,7 +354,7 @@ INT8U extract(INT32U Len)
 //    updateXF9(Len);
     break;
   default:
-    return 0;
+    inBuff[0];
   }
   return inBuff[0];
 }

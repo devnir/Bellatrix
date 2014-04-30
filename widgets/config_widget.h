@@ -5,7 +5,10 @@
 #include <QShowEvent>
 #include <QCloseEvent>
 
+
 #include "main_settings.h"
+#include "pluginadddialog.h"
+
 
 
 namespace Ui
@@ -33,12 +36,12 @@ class ConfigWidget : public QWidget
   private slots:
     void on_defButton_clicked();
     void on_QABarEnable_stateChanged(int arg1);
-
     void on_styleBox_currentIndexChanged(int index);
-
     void on_QASBarEn_stateChanged(int arg1);
-
     void on_tabWidget_currentChanged(int index);
+    void on_pluginWiew_cellChanged(int row, int column);
+    void on_addBtn_clicked();
+    void slotAddOkPresed(QString pluginPath, QString pluginName);
 
   signals:
     void signalEnabledQA(bool enabled);
@@ -48,6 +51,7 @@ class ConfigWidget : public QWidget
   private:
     Ui::ConfigWidget *ui;
     MainSettings set;
+    pluginAddDialog addPlugDialog;
 };
 
 #endif // CONFIG_WIDGET_H
