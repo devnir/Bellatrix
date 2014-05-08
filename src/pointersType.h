@@ -1,6 +1,17 @@
 #ifndef POINTERSTYPE_H
 #define POINTERSTYPE_H
 #include <QString>
+#include "mainwindow.h"
+typedef struct
+{
+  int major;
+  int minor;
+  QString name;
+  QString desc;
+  QString usedPkg;
+}TPluginVersion;
+
+typedef void (*td_getVersion)(TPluginVersion *plVersion);
 typedef void (*td_init)(void (*msgOut)(INT8U *buff, INT32U l),
                         void (*sClose)(INT32U),
                         INT32U index);

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 INT8U   OutBuff[1024];
-
+INT8U   nmeaToB2[]="$PORZA,0,115200,4*79\r\n";
 INT32U  baudTable[_BAUD_TABLE_SIZE_] =
 {
   9600,
@@ -99,6 +99,7 @@ void MainWindow::slotSearchTimeout()
     searchPort->setDataBits(QSerialPort::Data8);
     searchPort->setBaudRate(baudTable[searchIndex], QSerialPort::AllDirections);
     searchPort->write((char *)OutBuff, l);
+    searchPort->write((char *)nmeaToB2, sizeof(nmeaToB2));
     searchTimer->start();
   }
   else

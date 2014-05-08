@@ -3,98 +3,64 @@
 #include "logging.h"
 #include <QDebug>
 #include <QLibrary>
+#include <QVector>
+#include <QDirIterator>
+#include <QFileInfoList>
 
-TPlugin plugins[_MAX_PLUGINS_];
-bool initPluginPointers(int index);
-bool loadLib(int index);
+bool checkPlugin(QString fileName);
+bool loadLib(QString fileName, TPlugin *plugin, int index);
+QVector<TPlugin> pluginList;
+
 void MainWindow::load_plugins()
 {
   // »нициализаци€ структуры описани€ плагинов
-  for(INT32U i = 0; i < _MAX_PLUGINS_; i++)
-  {
-    plugins[i].validity = 0;
-    plugins[i].action = new QAction(this);
-    ui->menuPlugins->addAction(plugins[i].action);
-    plugins[i].action->setCheckable(true);
-    plugins[i].action->setEnabled(false);
-    plugins[i].action->setVisible(false);
-  }
   connect(ui->menuPlugins, SIGNAL(triggered(QAction*)),
           this, SLOT(slotPluginActions(QAction*)));
 
-
-  // «агрузка инсталированых плагинов
-  QSettings set(_PL_NAME_, QSettings::IniFormat);
-  int count = set.beginReadArray(_PL_ARR_);
-  if(count > _MAX_PLUGINS_)
-    count = _MAX_PLUGINS_;
-
-  for(int i = 0; i < count; i++)
+  QDirIterator dirIt("./plugins/",QDirIterator::Subdirectories);
+  while (dirIt.hasNext())
   {
-    set.setArrayIndex(i);
-    plugins[i].validity = set.value(_PLA_ENABLE_, 0).toInt();
-    plugins[i].name = set.value(_PLA_NAME_, "NoName").toString();
-    plugins[i].fileName = set.value(_PLA_FILE_, "").toString();
-    if(plugins[i].validity == 1)
-    {
-      plugins[i].action->setText(plugins[i].name);
-      if(initPluginPointers(i))
+    dirIt.next();
+    if (QFileInfo(dirIt.filePath()).isFile())
+      if (QFileInfo(dirIt.filePath()).suffix() == "dll")
       {
-        plugins[i].action->setEnabled(true);
-        plugins[i].action->setVisible(true);
+        if(checkPlugin(dirIt.filePath()))
+        {
+          TPlugin plugin;
+          if(loadLib(dirIt.filePath(), &plugin, pluginList.size()))
+          {
+            qDebug() << dirIt.filePath();            
+            plugin.action = new QAction(this);
+            plugin.fileName = dirIt.fileName();
+            plugin.action->setText(plugin.version.name);
+            ui->menuPlugins->addAction(plugin.action);
+            plugin.action->setCheckable(true);
+            plugin.action->setEnabled(true);
+            plugin.action->setVisible(true);
+            pluginList.append(plugin);
+          }
+        }
       }
-      else
-      {
-        plugins[i].validity = 0;
-        loging(_LOG_CRIT_, tr("Error on load plugin ") + plugins[i].name);
-      }
-    }
   }
-  set.endArray();
 }
 
 
 void MainWindow::slotPluginActions(QAction *act)
 {
-  for(int i = 0; i < _MAX_PLUGINS_; i++)
-  {
-    if(act == plugins[i].action)
+  for(int i = 0; i < pluginList.size(); i++)
+  {    
+    if(act == pluginList.at(i).action)
     {
-      if(plugins[i].validity == 1)
-      {
         if(act->isChecked())
         {
-          plugins[i].func.show();
+          pluginList.at(i).func.show();
         }
         else
         {
-          plugins[i].func.close();
-        }
-      }
+          pluginList.at(i).func.close();
+        }      
     }
   }
-}
-
-bool initPluginPointers(int index)
-{
-  if(index >= _MAX_PLUGINS_)
-    return false;
-
-  if(plugins[index].validity != 1)
-    return false;
-
-  QFile fs("./plugins/" + plugins[index].fileName);
-  if(!fs.exists())
-  {
-    return false;
-  }
-
-  if(!loadLib(index))
-  {
-    return false;
-  }
-
-  return true;
 }
 
 void msgOut(INT8U *buff, INT32U l)
@@ -109,12 +75,44 @@ void sClose(INT32U id)
   if(id >= _MAX_PLUGINS_)
     return;
 
-  plugins[id].action->setChecked(false);
+  pluginList.at(id).action->setChecked(false);
 }
 
-bool loadLib(int index)
+bool checkPlugin(QString fileName)
 {
-  QLibrary lib("./plugins/" + plugins[index].fileName);
+  QLibrary lib(fileName);
+  if(!lib.load())
+  {
+    qDebug() << lib.errorString();
+    return false;
+  }
+
+  td_getVersion version = (td_getVersion)lib.resolve("getVersion");
+  if(!version)
+  {
+    qDebug() << lib.errorString();
+    return false;
+  }
+  TPluginVersion pl;
+  version(&pl);
+
+  if(pl.major !=_VERSION_MAJOR_ )
+  {
+    qDebug() << "Major err";
+    return false;
+  }
+  if(pl.minor > _VERSION_MINOR_)
+  {
+    qDebug() << "Minor err";
+    return false;    
+  }
+  return true;
+}
+
+bool loadLib(QString fileName, TPlugin *plugin, int index)
+{  
+  QLibrary lib(fileName);
+
   if(!lib.load())
   {
     qDebug() << lib.errorString();
@@ -130,52 +128,58 @@ bool loadLib(int index)
 
   init(msgOut, sClose, index);
 
-  plugins[index].func.show = (td_show)lib.resolve("show");
-  if(!plugins[index].func.show)
+  td_getVersion version = (td_getVersion)lib.resolve("getVersion");
+  if(!version)
   {
     qDebug() << lib.errorString();
     return false;
   }
 
-  plugins[index].func.close = (td_close)lib.resolve("close");
-  if(!plugins[index].func.close)
+  version(&plugin->version);
+
+  plugin->func.show = (td_show)lib.resolve("show");
+  if(!plugin->func.show)
   {
     qDebug() << lib.errorString();
     return false;
   }
 
-  plugins[index].func.update = (td_update)lib.resolve("dataUpdate");
-  if(!plugins[index].func.update)
+  plugin->func.close = (td_close)lib.resolve("close");
+  if(!plugin->func.close)
   {
     qDebug() << lib.errorString();
     return false;
   }
 
-  plugins[index].func.changeStyle = (td_changeStyle)lib.resolve("changeStyle");
-  if(!plugins[index].func.changeStyle)
+  plugin->func.update = (td_update)lib.resolve("dataUpdate");
+  if(!plugin->func.update)
   {
     qDebug() << lib.errorString();
     return false;
   }
 
+  plugin->func.changeStyle = (td_changeStyle)lib.resolve("changeStyle");
+  if(!plugin->func.changeStyle)
+  {
+    qDebug() << lib.errorString();
+    return false;
+  }  
   return true;
 }
 
 void MainWindow::updatePluginData()
 {
-  for(int i = 0; i < _MAX_PLUGINS_; i++)
-  {
-    if(plugins[i].validity == 1)
-      plugins[i].func.update(Binr2DataBuff, Binr2DataSize);
+  for(int i = 0; i < pluginList.size(); i++)
+  {    
+      pluginList.at(i).func.update(Binr2DataBuff, Binr2DataSize);
   }
 }
 
 void MainWindow::updatePluginStyle(QString style)
 {
-  for(int i = 0; i < _MAX_PLUGINS_; i++)
+  for(int i = 0; i < pluginList.size(); i++)
   {
-    if(plugins[i].validity == 1)
-      plugins[i].func.changeStyle(style);
+    pluginList.at(i).func.changeStyle(style);
   }
 }
 

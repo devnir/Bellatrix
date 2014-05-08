@@ -70,6 +70,7 @@ void MainWindow::on_actionSearch_triggered()
 
 void MainWindow::closeEvent(QCloseEvent *)
 {
+  /*
   for(int i = 0; i < _MAX_PLUGINS_; i++)
   {
     if(plugins[i].validity)
@@ -79,7 +80,7 @@ void MainWindow::closeEvent(QCloseEvent *)
         plugins[i].func.close();
       }
     }
-  }
+  }*/
 }
 
 

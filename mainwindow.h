@@ -25,6 +25,7 @@ typedef struct
   td_changeStyle changeStyle;
 }TPointerFunc;
 
+
 typedef struct
 {
   INT8U validity;
@@ -32,7 +33,7 @@ typedef struct
   QString name;
   QString fileName;
   TPointerFunc func;
-
+  TPluginVersion version;
 }TPlugin;
 
 namespace Ui {
@@ -46,7 +47,7 @@ extern INT32U Binr2DataSize;
 extern INT8U   OutBuff[];
 extern BINR2_POINTERS b2Ptr;
 extern QSerialPort *port;
-
+extern QVector<TPlugin> pluginList;
 
 
 

@@ -2,7 +2,7 @@
 #define DEFINES_H
 
 #define _APP_NAME_          "Bellatrix"
-#define _VERSION_MAJOR_     0
+#define _VERSION_MAJOR_     1
 #define _VERSION_MINOR_     1
 #define _QAT_ENABLE_        1
 #define _QAS_ENABLE_        1

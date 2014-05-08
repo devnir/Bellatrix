@@ -25,9 +25,7 @@ SOURCES += main.cpp\
     widgets/infowidget.cpp \
     widgets/config_widget.cpp \
     src/util.cpp \
-    src/plugin_manager.cpp \
-    widgets/pluginadddialog.cpp \
-    widgets/plugineditdialog.cpp
+    src/plugin_manager.cpp
 
 HEADERS  += mainwindow.h \
     src/typedef.h \
@@ -40,15 +38,11 @@ HEADERS  += mainwindow.h \
     widgets/infowidget.h \
     widgets/config_widget.h \
     src/util.h \
-    src/pointersType.h \
-    widgets/pluginadddialog.h \
-    widgets/plugineditdialog.h
+    src/pointersType.h
 
 FORMS    += mainwindow.ui \
     widgets/infowidget.ui \
-    widgets/config_widget.ui \
-    widgets/pluginadddialog.ui \
-    widgets/plugineditdialog.ui
+    widgets/config_widget.ui
 INCLUDEPATH += src/
 INCLUDEPATH += widgets/
 
