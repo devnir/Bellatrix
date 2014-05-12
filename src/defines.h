@@ -14,7 +14,7 @@
 
 
 //--GUI
-#define _STATUS_LBL_COUNT_  5
+#define _STATUS_LBL_COUNT_  2
 //MS = Main Settings
 //MSG - Main Settings Group
 //MSK - Main Settings Key
@@ -42,5 +42,7 @@
 #define _LOG_CRIT_    0
 #define _LOG_GOOD_    1
 #define _LOG_NORM_    2
+//Read FILE
+#define _READ_SEGMEN_SIZE_  2048
 
 #endif // DEFINES_H

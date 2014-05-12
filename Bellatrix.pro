@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     widgets/infowidget.cpp \
     widgets/config_widget.cpp \
     src/util.cpp \
-    src/plugin_manager.cpp
+    src/plugin_manager.cpp \
+    src/logToFile.cpp
 
 HEADERS  += mainwindow.h \
     src/typedef.h \

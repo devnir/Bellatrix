@@ -16,6 +16,11 @@
 #include "config_widget.h"
 #include "Binr2.h"
 #include "pointersType.h"
+#include "QToolButton"
+#include "QDial"
+#include "QLabel"
+#include "QCheckBox"
+#include <QFileInfo>
 
 typedef struct
 {
@@ -75,6 +80,14 @@ class MainWindow : public QMainWindow
 
     void on_actionDisconnect_triggered();
 
+    void on_browseToolButton_clicked();
+
+    void on_recordToolButton_clicked();
+
+    void on_playToolButton_clicked();
+
+    void on_stopToolButton_clicked();
+
   public slots:
     void setEnabledQA(bool enabled);
     void setEnabledQAS(bool enabled);
@@ -87,10 +100,18 @@ class MainWindow : public QMainWindow
     void slotPluginActions(QAction *);
 
     void slotChangeSerialSettings();
+    void logFileReadimeout();
   private:
     Ui::MainWindow *ui;
     QComboBox *portBox;
     QComboBox *baudBox;
+    QFileInfo logFileInfo;
+    QFile     logFile;
+    quint64   logFileOffset;
+    QTimer    *logReadTimer;
+
+    //----------
+
     void guiInit();
     QLabel *stbLabel[_STATUS_LBL_COUNT_];    
 
@@ -117,6 +138,7 @@ class MainWindow : public QMainWindow
     void updatePluginStyle(QString style);
     //plugins
     void load_plugins();
+
 
 
 };

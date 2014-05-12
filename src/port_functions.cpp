@@ -154,6 +154,14 @@ void MainWindow::slotSerialRead()
 {
   QByteArray data = port->readAll();
   INT8U ret;
+  if(ui->recordToolButton->isChecked())
+  {
+    logFile.write(data);
+    QString str;
+    str.sprintf("Size: %d", logFileInfo.size());
+    ui->fileSize->setText(str);
+  }
+
   for(int i = 0; i< data.length(); i++)
   {
     ret = Binr2Unpack(data.at(i) & 0xFF);
@@ -180,7 +188,6 @@ void MainWindow::on_actionConnect_triggered()
   ui->actionDisconnect->setEnabled(true);
   ui->actionSearch->setEnabled(false);
   ui->serialBar->setEnabled(false);
-  ui->menuPlugins->setEnabled(true);
 
   port->setPortName(portBox->currentText());
   if(port->open(QIODevice::ReadWrite))

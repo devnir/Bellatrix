@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "logging.h"
+#include "QFileDialog"
+#include <QDebug>
 BINR2_POINTERS b2Ptr;
 BINR2x80 px80;
 BINR2x90 px90;
@@ -27,6 +29,10 @@ MainWindow::MainWindow(QWidget *parent) :
   load_plugins();
   changeStyle();
   searchInit();
+  logFileOffset = 0;
+  logReadTimer = new QTimer(this);
+  logReadTimer->setSingleShot(true);
+  connect(logReadTimer, SIGNAL(timeout()), this, SLOT(logFileReadimeout()));
 
 }
 
@@ -69,19 +75,149 @@ void MainWindow::on_actionSearch_triggered()
 }
 
 void MainWindow::closeEvent(QCloseEvent *)
-{
-  /*
-  for(int i = 0; i < _MAX_PLUGINS_; i++)
+{  
+  for(int i = 0; i < pluginList.count(); i++)
   {
-    if(plugins[i].validity)
+    if(pluginList.at(i).action->isChecked())
     {
-      if(plugins[i].action->isChecked())
-      {
-        plugins[i].func.close();
-      }
+      pluginList.at(i).func.close();
     }
-  }*/
+  }
 }
 
 
+void MainWindow::on_browseToolButton_clicked()
+{
+  QFileDialog *fd = new QFileDialog(this);
+  fd->setFileMode(QFileDialog::AnyFile);
+  fd->setDirectory("./");
+  if(fd->exec())
+  {
+    logFileInfo.setFile(fd->selectedFiles().at(0));
+    QString str("File: ");
+    str += logFileInfo.fileName();
+    ui->fileNameLbl->setText(str);
+    str.clear();
+    str.sprintf("Size: %d", logFileInfo.size());
+    ui->fileSize->setText(str);
+  }
+}
 
+void MainWindow::on_recordToolButton_clicked()
+{
+  if(ui->recordToolButton->isChecked())
+  {
+    if(logFileInfo.fileName().isEmpty())
+    {
+      logFileInfo.setFile("./default.b2");
+      logFile.setFileName(logFileInfo.filePath());
+    }
+    logFile.open(QIODevice::ReadWrite);
+    QString str("File: ");
+    str += logFileInfo.fileName();
+    ui->fileNameLbl->setText(str);
+    str.clear();
+    str.sprintf("Size: %d", logFileInfo.size());
+    ui->fileSize->setText(str);
+  }
+  else
+  {
+    logFile.close();
+    QString str;
+    str.sprintf("Size: %d", logFileInfo.size());
+    ui->fileSize->setText(str);
+  }
+}
+
+void MainWindow::on_playToolButton_clicked()
+{
+  if(logFile.isOpen())
+  {
+    logFile.close();
+  }
+  QString str("File: ");
+  str += logFileInfo.fileName();
+  ui->fileNameLbl->setText(str);
+  str.clear();
+  str.sprintf("Size: %d", logFileInfo.size());
+  ui->fileSize->setText(str);
+
+  if(ui->playToolButton->isChecked())
+  {
+    logReadTimer->setInterval(ui->intervalLcd->value());
+    QString str;
+    str.sprintf("State: read");
+    ui->fileStatus->setText(str);
+    logReadTimer->start();
+  }
+  else
+  {
+    logReadTimer->stop();
+    QString str;
+    str.sprintf("State: pause");
+    ui->fileStatus->setText(str);
+  }
+}
+
+void MainWindow::logFileReadimeout()
+{
+  QFile readFile;
+  readFile.setFileName(logFileInfo.filePath());
+  QByteArray buff;
+  quint64 size = 0;
+  QString str;
+  if(readFile.open(QIODevice::ReadOnly))
+  {
+    readFile.seek(logFileOffset);
+    buff = readFile.read(_READ_SEGMEN_SIZE_);
+    size = readFile.size();
+    readFile.close();
+  }
+  else
+  {
+    str.clear();
+    str.sprintf("State: read err");
+    ui->fileStatus->setText(str);
+    return;
+  }
+  for(int i = 0; i < buff.length(); i++)
+  {
+    int ret = Binr2Unpack(buff.at(i) & 0xFF);
+    if(ret != 0)
+    {
+      logFileOffset += i;
+      updateLocalData();
+      updatePluginData();
+      logReadTimer->setInterval(ui->intervalLcd->value());
+      logReadTimer->start();
+      str.clear();
+      str.sprintf("State: read %d\%", int(100./size * logFileOffset));
+      ui->fileStatus->setText(str);
+      return;
+    }
+  }
+  str.clear();
+  logFileOffset += buff.length();
+  str.sprintf("State: read %d\%", int(100./size * logFileOffset));
+  ui->fileStatus->setText(str);
+  if(logFileOffset >= size)
+  {
+    str.sprintf("State: read done");
+    ui->fileStatus->setText(str);
+    return;
+  }
+  logReadTimer->setInterval(ui->intervalLcd->value());
+  logReadTimer->start();
+}
+
+void MainWindow::on_stopToolButton_clicked()
+{
+  logReadTimer->stop();
+  logFileOffset = 0;
+  ui->playToolButton->setChecked(false);
+  if(ui->recordToolButton->isChecked())
+  {
+    ui->recordToolButton->setChecked(false);
+    logFile.close();
+  }
+}

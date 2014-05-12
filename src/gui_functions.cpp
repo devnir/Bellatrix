@@ -61,6 +61,8 @@ void MainWindow::guiInit()
 
   setStatusText(_LOG_NORM_, tr("Disconnected"));
   setPortText(baudTable[index]);
+
+  ui->intervalLcd->display(ui->dial->value());
 }
 
 
@@ -102,6 +104,11 @@ void MainWindow::changeStyle()
   ui->actionShow_logs->setIcon(QIcon("./template/" + styleName + "/images/info.png"));
   ui->actionConnect->setIcon(QIcon("./template/" + styleName + "/images/connect.png"));
   ui->actionDisconnect->setIcon(QIcon("./template/" + styleName + "/images/disconnect.png"));
+
+  ui->playToolButton->setIcon(QIcon("./template/" + styleName + "/images/button_play.png"));
+  ui->stopToolButton->setIcon(QIcon("./template/" + styleName + "/images/button_stop.png"));
+  ui->recordToolButton->setIcon(QIcon("./template/" + styleName + "/images/button_rec.png"));
+  ui->browseToolButton->setIcon(QIcon("./template/" + styleName + "/images/button_brows.png"));
 }
 
 void MainWindow::setStatusText(int type, QString str)
@@ -173,5 +180,32 @@ void MainWindow::updateLocalData()
   ui->GPS_label->setText(str.sprintf("GPS: %02d", b2Ptr.p90->nGPS));
   ui->GLN_label->setText(str.sprintf("GLN: %02d", b2Ptr.p90->nGLN));
   ui->GLL_label->setText(str.sprintf("GLL: %02d", b2Ptr.p90->nGLL));
+
+  ui->time_label->setText(str.sprintf("Time: %s", clockString(b2Ptr.p90->timeInt/1000)));
+  ui->date_label->setText(str.sprintf("Date: %s", dateString(b2Ptr.p90->timeInt/1000, b2Ptr.p90->week)));
+
+
+  if(b2Ptr.p90->PVTStatus & 0x1)
+  {
+    str.clear();
+
+   if(b2Ptr.p90->PVTStatus & 0x20)
+     str = colorStr[_LOG_NORM_] + "Status: CORR" + endStr;
+   else
+   {
+    if(b2Ptr.p90->PVTStatus & 0x2)
+     str = colorStr[_LOG_NORM_] +"Status: 2D" + endStr;
+    else
+     str = colorStr[_LOG_NORM_] + "Status: 3D"+  endStr;
+    if(b2Ptr.p90->PVTStatus & 0x8)
+     str = colorStr[_LOG_NORM_] + "Status:  diff" + endStr;
+   }
+  }
+  else
+  {
+   str = colorStr[_LOG_CRIT_] + "Status: OLD" + endStr;
+  }
+  ui->status_label->setText(str);
+
 }
 
