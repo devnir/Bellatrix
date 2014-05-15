@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 INT8U   OutBuff[1024];
-INT8U   nmeaToB2[]="$PORZA,0,115200,4*79\r\n";
+INT8U   nmeaToB2[128];
 INT32U  baudTable[_BAUD_TABLE_SIZE_] =
 {
   9600,
@@ -60,7 +60,7 @@ void MainWindow::searchDone()
   set.load();
   set.serial.portName = portBox->currentText();
   set.serial.baud = baudTable[searchIndex];
-  baudBox->setCurrentIndex(searchIndex);
+//  baudBox->setCurrentIndex(searchIndex);
   setStatusText(_LOG_GOOD_, tr("Sync ok"));
   searchStop();
 }
@@ -80,7 +80,7 @@ void MainWindow::slotSearchDataRead()
 }
 
 void MainWindow::slotSearchTimeout()
-{
+{  
   searchPort->close();
   searchIndex++;
   if(searchIndex >= _BAUD_TABLE_SIZE_)
@@ -91,6 +91,20 @@ void MainWindow::slotSearchTimeout()
   }
   setPortText(baudTable[searchIndex]);
   int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2Single, 1);
+  int nmeaL = 0;
+  l += store8lu(OutBuff + l, 0x02);
+  l += store8lu(OutBuff + l, 0x00);
+  l += store8lu(OutBuff + l, 0x00);
+  l += store32lu(OutBuff + l, baudTable[baudBox->currentIndex()]);
+  l = Binr2Encode(OutBuff, OutBuff, l);
+  nmeaL = sprintf((char *)nmeaToB2, "$PORZA,0,%d,4", baudTable[baudBox->currentIndex()]);
+  INT8U Sum = 0;
+
+  for(INT32U i = 1; i < nmeaL; i++)
+    Sum ^= nmeaToB2[i];
+  nmeaL += sprintf((char *)nmeaToB2 + nmeaL, "*%02x\r\n", Sum);
+
+
   searchPort->setPortName(portBox->currentText());
   if(searchPort->open(QIODevice::ReadWrite))
   {
@@ -99,7 +113,7 @@ void MainWindow::slotSearchTimeout()
     searchPort->setDataBits(QSerialPort::Data8);
     searchPort->setBaudRate(baudTable[searchIndex], QSerialPort::AllDirections);
     searchPort->write((char *)OutBuff, l);
-    searchPort->write((char *)nmeaToB2, sizeof(nmeaToB2));
+    searchPort->write((char *)nmeaToB2, nmeaL);
     searchTimer->start();
   }
   else
@@ -157,9 +171,8 @@ void MainWindow::slotSerialRead()
   if(ui->recordToolButton->isChecked())
   {
     logFile.write(data);
-    QString str;
-    str.sprintf("Size: %d", logFileInfo.size());
-    ui->fileSize->setText(str);
+    logFileSize += data.length();
+    ui->fileSize->setText(fileSizeToStr(logFileSize));
   }
 
   for(int i = 0; i< data.length(); i++)
@@ -196,6 +209,7 @@ void MainWindow::on_actionConnect_triggered()
     port->setParity(QSerialPort::NoParity);
     port->setDataBits(QSerialPort::Data8);
     port->setBaudRate(baudTable[baudBox->currentIndex()], QSerialPort::AllDirections);
+    setPortText(baudTable[baudBox->currentIndex()]);
     port->write((char *)OutBuff, l);
     setStatusText(_LOG_GOOD_, tr("Connected"));
 
@@ -225,6 +239,5 @@ void MainWindow::on_actionDisconnect_triggered()
     ui->actionDisconnect->setEnabled(false);
     ui->actionSearch->setEnabled(true);
     ui->serialBar->setEnabled(true);
-    ui->menuPlugins->setEnabled(false);
     setStatusText(_LOG_NORM_, tr("Disconnected"));
 }

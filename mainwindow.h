@@ -20,6 +20,7 @@
 #include "QDial"
 #include "QLabel"
 #include "QCheckBox"
+#include "util.h"
 #include <QFileInfo>
 
 typedef struct
@@ -47,6 +48,7 @@ namespace Ui {
 
 extern INT32U  baudTable[_BAUD_TABLE_SIZE_];
 extern TPlugin plugins[_MAX_PLUGINS_];
+extern quint64   logFileSize;
 extern INT8U Binr2DataBuff[];
 extern INT32U Binr2DataSize;
 extern INT8U   OutBuff[];
@@ -102,6 +104,7 @@ class MainWindow : public QMainWindow
     void slotChangeSerialSettings();
     void logFileReadimeout();
   private:
+
     Ui::MainWindow *ui;
     QComboBox *portBox;
     QComboBox *baudBox;

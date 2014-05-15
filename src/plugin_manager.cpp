@@ -38,7 +38,17 @@ void MainWindow::load_plugins()
             plugin.action->setEnabled(true);
             plugin.action->setVisible(true);
             pluginList.append(plugin);
+            loging(_LOG_GOOD_, "Plugin \"" + plugin.version.name + QString(" v%1").arg(plugin.version.major) + QString(".%1 \" loaded successfully").arg(plugin.version.minor));
+
           }
+          else
+          {
+            loging(_LOG_CRIT_,  "Unresolved dependencies function names in " + dirIt.fileName());
+          }
+        }
+        else
+        {
+          loging(_LOG_CRIT_,  "Invalid plugin version in " + dirIt.fileName());
         }
       }
   }

@@ -88,3 +88,20 @@ char* dateString(int t, int w)
  return date;
 }
 
+QString fileSizeToStr(quint64 size)
+{
+  QString str;
+  if(size > 1024*1024)
+  {
+    str.sprintf("Size: %0.03f Mb", size/(1024.*1024.));
+  }
+  else if(size > 1024)
+  {
+    str.sprintf("Size: %0.03f Kb", size/(1024.));
+  }
+  else
+    str.sprintf("Size: %d b", size);
+
+  return str;
+}
+

@@ -10,6 +10,7 @@ BINR2xC0 pxC0;
 
 INT8U Binr2DataBuff[4096];
 INT32U Binr2DataSize = 0;
+quint64   logFileSize = 0;
 QSerialPort *port;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -70,7 +71,6 @@ void MainWindow::on_actionSearch_triggered()
     ui->actionSearch->setEnabled(false);
     ui->actionConnect->setEnabled(false);
     ui->serialBar->setEnabled(false);
-    ui->menuPlugins->setEnabled(false);
     searchStart();
 }
 
@@ -88,44 +88,47 @@ void MainWindow::closeEvent(QCloseEvent *)
 
 void MainWindow::on_browseToolButton_clicked()
 {
+  QDir dir("./");
+  dir.mkdir("_Files_");
   QFileDialog *fd = new QFileDialog(this);
   fd->setFileMode(QFileDialog::AnyFile);
-  fd->setDirectory("./");
+  fd->setDirectory("./_Files_/");
   if(fd->exec())
   {
     logFileInfo.setFile(fd->selectedFiles().at(0));
     QString str("File: ");
     str += logFileInfo.fileName();
     ui->fileNameLbl->setText(str);
-    str.clear();
-    str.sprintf("Size: %d", logFileInfo.size());
-    ui->fileSize->setText(str);
+    ui->fileSize->setText(fileSizeToStr(logFileInfo.size()));
   }
 }
 
 void MainWindow::on_recordToolButton_clicked()
 {
+  QDir dir("./");
+  dir.mkdir("_Files_");
+
   if(ui->recordToolButton->isChecked())
   {
+    logFileSize = 0;
+    ui->fileStatus->setText("State: recording");
     if(logFileInfo.fileName().isEmpty())
     {
-      logFileInfo.setFile("./default.b2");
+      logFileInfo.setFile("./_Files_/default.b2");
       logFile.setFileName(logFileInfo.filePath());
     }
     logFile.open(QIODevice::ReadWrite);
     QString str("File: ");
     str += logFileInfo.fileName();
     ui->fileNameLbl->setText(str);
-    str.clear();
-    str.sprintf("Size: %d", logFileInfo.size());
-    ui->fileSize->setText(str);
+
+    ui->fileSize->setText(fileSizeToStr(logFileSize));
   }
   else
   {
     logFile.close();
-    QString str;
-    str.sprintf("Size: %d", logFileInfo.size());
-    ui->fileSize->setText(str);
+    ui->fileStatus->setText("State: stop");
+    ui->fileSize->setText(fileSizeToStr(logFileSize));
   }
 }
 
@@ -138,9 +141,7 @@ void MainWindow::on_playToolButton_clicked()
   QString str("File: ");
   str += logFileInfo.fileName();
   ui->fileNameLbl->setText(str);
-  str.clear();
-  str.sprintf("Size: %d", logFileInfo.size());
-  ui->fileSize->setText(str);
+  ui->fileSize->setText(fileSizeToStr(logFileInfo.size()));
 
   if(ui->playToolButton->isChecked())
   {
