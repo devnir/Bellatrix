@@ -3,9 +3,9 @@
 # Project created by QtCreator 2014-02-26T09:16:15
 #
 #-------------------------------------------------
-
 QT       += core gui
 QT       += serialport
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -52,3 +52,5 @@ OTHER_FILES += icon.rc
 
 RESOURCES += \
     img.qrc
+
+include ( c:/Qwt-6.1.0/features/qwt.prf )

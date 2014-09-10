@@ -33,6 +33,7 @@ typedef enum
   Binr2Single = 1,
   Binr2PVT =2,
   Binr2Second = 3,
+  Binr2Meas = 4,
   Binr2CancelAll = 0xFF
 }BINR2_INTERVAL;
 //-----------------------------x80----------------------------------------------

@@ -207,5 +207,10 @@ void MainWindow::updateLocalData()
   }
   ui->status_label->setText(str);
 
+
+
+  //b2Ptr.p92->timeInt
+
+
 }
 

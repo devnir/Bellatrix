@@ -183,6 +183,15 @@ void MainWindow::updatePluginData()
   {    
       pluginList.at(i).func.update(Binr2DataBuff, Binr2DataSize);
   }
+
+  if(Binr2DataBuff[0] == 0x92)
+  {
+    INT32U t1 = load32lu(Binr2DataBuff + 1);
+    INT32U t2 = load32lu(Binr2DataBuff + 5);
+    double t = t1 + t2 / 1e9;
+    qDebug("0x92 time %lf", t);
+    qDebug("Meas count = %d", (Binr2DataSize - 13) / 22);
+  }
 }
 
 void MainWindow::updatePluginStyle(QString style)

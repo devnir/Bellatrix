@@ -6,6 +6,7 @@
 BINR2_POINTERS b2Ptr;
 BINR2x80 px80;
 BINR2x90 px90;
+BINR2x92 px92;
 BINR2xC0 pxC0;
 
 INT8U Binr2DataBuff[4096];
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
   b2Ptr.p80 = &px80;
   b2Ptr.p90 = &px90;
   b2Ptr.pC0 = &pxC0;
+  b2Ptr.p92 = &px92;
   Binr2Init(b2Ptr);  
   guiInit();
   load_plugins();
@@ -33,8 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
   logFileOffset = 0;
   logReadTimer = new QTimer(this);
   logReadTimer->setSingleShot(true);
-  connect(logReadTimer, SIGNAL(timeout()), this, SLOT(logFileReadimeout()));
-
+  connect(logReadTimer, SIGNAL(timeout()), this, SLOT(logFileReadimeout())); 
 }
 
 MainWindow::~MainWindow()
