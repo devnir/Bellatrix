@@ -13,6 +13,7 @@ INT8U Binr2DataBuff[4096];
 INT32U Binr2DataSize = 0;
 quint64   logFileSize = 0;
 QSerialPort *port;
+QSerialPort *searchPort;
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -100,7 +101,7 @@ void MainWindow::on_browseToolButton_clicked()
     QString str("File: ");
     str += logFileInfo.fileName();
     ui->fileNameLbl->setText(str);
-    ui->fileSize->setText(fileSizeToStr(logFileInfo.size()));
+    ui->fileSize->setText(fileSizeToStr(logFileInfo.size()));    
   }
 }
 
@@ -108,21 +109,20 @@ void MainWindow::on_recordToolButton_clicked()
 {
   QDir dir("./");
   dir.mkdir("_Files_");
-
   if(ui->recordToolButton->isChecked())
   {
     logFileSize = 0;
     ui->fileStatus->setText("State: recording");
     if(logFileInfo.fileName().isEmpty())
     {
-      logFileInfo.setFile("./_Files_/default.b2");
-      logFile.setFileName(logFileInfo.filePath());
+      logFileInfo.setFile("./_Files_/default.b2");      
     }
+    logFile.setFileName(logFileInfo.filePath());
     logFile.open(QIODevice::ReadWrite);
+    logFile.close();
     QString str("File: ");
     str += logFileInfo.fileName();
     ui->fileNameLbl->setText(str);
-
     ui->fileSize->setText(fileSizeToStr(logFileSize));
   }
   else

@@ -54,6 +54,7 @@ extern INT32U Binr2DataSize;
 extern INT8U   OutBuff[];
 extern BINR2_POINTERS b2Ptr;
 extern QSerialPort *port;
+extern QSerialPort *searchPort;
 extern QVector<TPlugin> pluginList;
 
 
@@ -128,7 +129,7 @@ class MainWindow : public QMainWindow
 
     //SYNC
     void searchInit();
-    QSerialPort *searchPort;
+
     QTimer      *searchTimer;
     INT32U       searchIndex;
     void       searchStart();

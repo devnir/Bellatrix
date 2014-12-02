@@ -12,15 +12,17 @@ INT32U  baudTable[_BAUD_TABLE_SIZE_] =
 
 void MainWindow::searchInit()
 {
-  searchPort = new QSerialPort();
-  port = new QSerialPort();
+  searchPort = new QSerialPort(this);
+  port = new QSerialPort(this);
 
   searchTimer = new QTimer();
-  searchTimer->setInterval(200);
+  searchTimer->setInterval(300);
   searchTimer->setSingleShot(true);
+
+
+  connect(port, SIGNAL(readyRead()), this, SLOT(slotSerialRead()));
   connect(searchPort, SIGNAL(readyRead()), this, SLOT(slotSearchDataRead()));
   connect(searchTimer, SIGNAL(timeout()), this, SLOT(slotSearchTimeout()));
-  connect(port, SIGNAL(readyRead()), this, SLOT(slotSerialRead()));
 }
 
 void MainWindow::searchStart()
@@ -28,10 +30,11 @@ void MainWindow::searchStart()
   searchIndex = 0;
   setStatusText(_LOG_NORM_, tr("Search"));
   setPortText(baudTable[searchIndex]);
-  int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2PVT, 1);
+  int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2CancelAll, 1);
   searchPort->setPortName(portBox->currentText());
   if(searchPort->open(QIODevice::ReadWrite))
   {
+    connect(searchPort, SIGNAL(readyRead()), this, SLOT(slotSearchDataRead()));
     searchPort->setFlowControl(QSerialPort::NoFlowControl);
     searchPort->setParity(QSerialPort::NoParity);
     searchPort->setDataBits(QSerialPort::Data8);
@@ -48,6 +51,7 @@ void MainWindow::searchStart()
 void MainWindow::searchStop()
 {
   searchPort->close();
+  disconnect(searchPort, SIGNAL(readyRead()), this, SLOT(slotSearchDataRead()));
   ui->serialBar->setEnabled(true);
   ui->actionConnect->setEnabled(true);
   ui->actionSearch->setEnabled(true);
@@ -60,13 +64,14 @@ void MainWindow::searchDone()
   set.load();
   set.serial.portName = portBox->currentText();
   set.serial.baud = baudTable[searchIndex];
-//  baudBox->setCurrentIndex(searchIndex);
+  baudBox->setCurrentIndex(searchIndex);
   setStatusText(_LOG_GOOD_, tr("Sync ok"));
   searchStop();
 }
 
 void MainWindow::slotSearchDataRead()
 {
+  //searchTimer->stop();
   QByteArray data = searchPort->readAll();
   INT8U ret;
   for(int i = 0; i< data.length(); i++)
@@ -75,8 +80,11 @@ void MainWindow::slotSearchDataRead()
     if(ret == 0x80)
     {
       searchDone();
+      disconnect(searchPort, SIGNAL(readyRead()), this, SLOT(slotSearchDataRead()));
+      return;
     }
   }
+  //searchTimer->start();
 }
 
 void MainWindow::slotSearchTimeout()
@@ -108,6 +116,7 @@ void MainWindow::slotSearchTimeout()
   searchPort->setPortName(portBox->currentText());
   if(searchPort->open(QIODevice::ReadWrite))
   {
+    connect(searchPort, SIGNAL(readyRead()), this, SLOT(slotSearchDataRead()));
     searchPort->setFlowControl(QSerialPort::NoFlowControl);
     searchPort->setParity(QSerialPort::NoParity);
     searchPort->setDataBits(QSerialPort::Data8);
@@ -170,9 +179,11 @@ void MainWindow::slotSerialRead()
   INT8U ret;
   if(ui->recordToolButton->isChecked())
   {
+    logFile.open(QIODevice::Append);
     logFile.write(data);
     logFileSize += data.length();
     ui->fileSize->setText(fileSizeToStr(logFileSize));
+    logFile.close();
   }
 
   for(int i = 0; i< data.length(); i++)
