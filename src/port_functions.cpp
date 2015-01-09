@@ -30,7 +30,7 @@ void MainWindow::searchStart()
   searchIndex = 0;
   setStatusText(_LOG_NORM_, tr("Search"));
   setPortText(baudTable[searchIndex]);
-  int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2CancelAll, 1);
+  int l = Binr2ReqEncode(OutBuff, 0x90, Binr2PVT, 1);
   searchPort->setPortName(portBox->currentText());
   if(searchPort->open(QIODevice::ReadWrite))
   {

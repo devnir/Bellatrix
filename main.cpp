@@ -3,7 +3,12 @@
 
 int main(int argc, char *argv[])
 {
-  QApplication a(argc, argv);
+  QStringList paths = QCoreApplication::libraryPaths();
+      paths.append(".");
+      paths.append("platforms");
+      paths.append(QCoreApplication::applicationDirPath() + "/plugins");
+      QCoreApplication::setLibraryPaths(paths);
+  QApplication a(argc, argv);  
   MainWindow w;
   w.show();
 

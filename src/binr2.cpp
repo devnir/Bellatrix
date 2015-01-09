@@ -943,8 +943,8 @@ void updateXBA(INT32U len)
     pLib.pBA->sat[i].PRN = load16lu(inBuff + 4 + (i * 9));
     pLib.pBA->sat[i].IOD = load16lu(inBuff + 5 + (i * 9));
     pLib.pBA->sat[i].UDRE = load16lu(inBuff + 7 + (i * 9));
-    pLib.pBA->sat[i].PRC = load16lu(inBuff + 9 + (i * 9));
-    pLib.pBA->sat[i].RRC = load16lu(inBuff + 11 + (i * 9));
+    pLib.pBA->sat[i].PRC = load16ls(inBuff + 9 + (i * 9));
+    pLib.pBA->sat[i].RRC = load16ls(inBuff + 11 + (i * 9));
     pLib.pBA->sat[i].valid=1;
   }
   return;
