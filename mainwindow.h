@@ -91,6 +91,8 @@ class MainWindow : public QMainWindow
 
     void on_stopToolButton_clicked();
 
+    void on_pushButton_clicked();
+
   public slots:
     void setEnabledQA(bool enabled);
     void setEnabledQAS(bool enabled);

@@ -223,3 +223,9 @@ void MainWindow::on_stopToolButton_clicked()
     logFile.close();
   }
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    int l = Binr2ReqEncode(OutBuff, 0xC0, Binr2Meas, 1);
+    port->write((char *)OutBuff, l);
+}

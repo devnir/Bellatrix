@@ -183,7 +183,7 @@ void MainWindow::updatePluginData()
   {    
       pluginList.at(i).func.update(Binr2DataBuff, Binr2DataSize);
   }
-
+  qDebug("Income: 0x%02X", Binr2DataBuff[0]&0xFF);
   if(Binr2DataBuff[0] == 0x92)
   {
     INT32U t1 = load32lu(Binr2DataBuff + 1);
